@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="TurkishTeaMessenger">
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='ru.klinichev.TurkishTeaMessenger.TurkishTeaMessenger' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/TurkishTeaMessenger/greet" class="ru.klinichev.TurkishTeaMessenger.server.GreetingServiceImpl" />
+
+</module>

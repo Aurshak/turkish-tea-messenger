@@ -1,0 +1,30 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	.button {
+		margin: 6px 6px 6px;
+	}
+	.bottomPanel {
+		margin: 60px 0px 10px;
+	}
+	</ui:style>
+	<g:HTMLPanel>
+	    <div><h1>Welcome to the Hot Tea Messenger!</h1></div>
+	    <div align="center">
+	        <g:VerticalPanel horizontalAlignment="align_center">
+				<g:Label text="Please sign up or log in"></g:Label>
+				<g:HorizontalPanel>
+				    <g:Button ui:field="signUpButton" text="Sign up" styleName="{style.button}"></g:Button>
+				    <g:Button ui:field="logInButton" text="Log in" styleName="{style.button}"></g:Button>
+				</g:HorizontalPanel>
+				<g:HTMLPanel styleName="{style.bottomPanel}">
+				    <img src="cay-keyfi.jpg" height="120" width="180" />
+				</g:HTMLPanel>
+			</g:VerticalPanel>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 
