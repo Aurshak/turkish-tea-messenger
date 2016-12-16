@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:HTMLPanel styleName="htmlPanel">
+	    <g:HorizontalPanel styleName="topPanel">
+			<g:Image url="cay.jpg" styleName="icon" />
+			<g:Label ui:field="topLabel"  styleName="veryImportant"/>
+			<g:cell horizontalAlignment="ALIGN_RIGHT">
+				<g:Button ui:field="exit" text="Exit" styleName="button" />
+			</g:cell>
+		</g:HorizontalPanel>
+		<g:ResizeLayoutPanel ui:field="mainPanel" styleName="contentPanel" />
+	</g:HTMLPanel>
+</ui:UiBinder> 

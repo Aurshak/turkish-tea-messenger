@@ -1,0 +1,13 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:FlowPanel styleName="chatPanel">
+		<g:ScrollPanel ui:field="scrollPanel" styleName="messageList">
+			<g:FlowPanel ui:field="messages" />
+		</g:ScrollPanel>
+		<g:FlowPanel styleName="send">
+			<g:TextArea ui:field="sendArea" styleName="sendArea" />
+			<g:Button ui:field="send" text="Send" styleName="sendButton" />
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder> 
