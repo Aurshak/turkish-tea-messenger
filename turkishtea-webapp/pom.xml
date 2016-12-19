@@ -78,4 +78,16 @@
 			<artifactId>h2</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<packagingExcludes>WEB-INF/lib/geronimo-jpa_2.0_spec-1.0.jar</packagingExcludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

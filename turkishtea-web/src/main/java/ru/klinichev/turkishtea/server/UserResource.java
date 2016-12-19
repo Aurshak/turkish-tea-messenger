@@ -22,6 +22,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,12 +30,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import ru.klinichev.turkishtea.server.service.UserService;
+import ru.klinichev.turkishtea.shared.User;
 
 @RestController
 @RequestMapping("/users")
 @Path("users")
 public class UserResource {
-	
+
+	@Autowired
+	private UserService userService;
+
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
 	String url = "jdbc:sqlite:C:\\sqlite\\db\\hottea.db";
 	private static final Logger simpleLogger = Logger.getLogger("UserResource");
 	
@@ -49,8 +59,10 @@ public class UserResource {
 		password = escapeHtml(password);
 		
 		String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+
+		userService.addUser(new User(login, password));
 		
-		Connection c = null;
+		/* Connection c = null;
 		PreparedStatement pst = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -72,7 +84,7 @@ public class UserResource {
 			catch (SQLException e) {
 				simpleLogger.log(Level.SEVERE, "addUser(): Exception in finally-try-block", e);
 			}
-		}
+		} */
 		
 	}
 	
@@ -95,21 +107,24 @@ public class UserResource {
 		login = escapeHtml(login);
 		password = escapeHtml(password);
 		
-		boolean result = false;
+		// boolean result = false;
+
+		if (userService.getUserByName(login).equals(null)) return false;
+		else {
+			String hashed = userService.getUserByName(login).getPassword();
+			if (BCrypt.checkpw(password, hashed)) return true;
+			else return false;
+		}
 		
-		Connection c = null;
+		/* Connection c = null;
 		Statement st = null;
+		ResultSet rs = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection(url);
 			st = c.createStatement();
 			st.setQueryTimeout(30);
-			ResultSet rs = st.executeQuery("select password from users where name = '" + login + "'");
-			if (rs.isClosed()) return false;
-			String hashed = rs.getString("password");
-			if (BCrypt.checkpw(password, hashed)) {
-				result = true;
-			}
+			rs = st.executeQuery("select password from users where name = '" + login + "'");
 		}
 		catch (Exception e) {
 			simpleLogger.log(Level.SEVERE, "checkUser(): Exception in try-block: ", e);
@@ -123,8 +138,14 @@ public class UserResource {
 			catch (SQLException e) {
 				simpleLogger.log(Level.SEVERE, "checkUser(): Exception in finally-try-block", e);
 			}
+		} */
+
+		/* if (rs.isClosed()) return false;
+		String hashed = rs.getString("password");
+		if (BCrypt.checkpw(password, hashed)) {
+			result = true;
 		}
-		return result;
+		return result; */
 	}
 
 	/* @POST
@@ -149,10 +170,12 @@ public class UserResource {
 	@GetMapping(produces="application/json")
 	@GET
 	@Produces("application/json")
-	public Map<Integer, String> getAllUsers() {
+	public List<User> getAllUsers() {
 		simpleLogger.log(Level.INFO, "Starting getAllUsers method");
-		Map<Integer, String> users = new HashMap<>();
-		Connection c = null;
+
+		List<User> userList = userService.getAllUsers();
+
+		/* Connection c = null;
 		Statement st = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -176,8 +199,9 @@ public class UserResource {
 			catch (SQLException e) {
 				simpleLogger.log(Level.SEVERE, "getAllUsers(): Exception in finally-try-block", e);
 			}
-		}
-		return users;
+		} */
+
+		return userList;
 	}
 
 }

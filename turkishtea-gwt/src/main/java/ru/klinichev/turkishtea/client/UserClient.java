@@ -11,6 +11,7 @@ import javax.ws.rs.QueryParam;
 
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
+import ru.klinichev.turkishtea.shared.User;
 
 @Path("/api/users")
 public interface UserClient extends RestService {
@@ -25,7 +26,7 @@ public interface UserClient extends RestService {
 			MethodCallback<Boolean> callback) throws RuntimeException;
 	
 	@GET
-	void getAllUsers(MethodCallback<Map<Integer, String>> callback);
+	void getAllUsers(MethodCallback<List<User>> callback);
 	
 	/* @POST
 	void setSessionName(@QueryParam("name") String name, MethodCallback<Void> callback);

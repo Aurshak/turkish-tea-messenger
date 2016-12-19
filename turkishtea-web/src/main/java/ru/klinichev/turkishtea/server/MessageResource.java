@@ -32,7 +32,6 @@ import ru.klinichev.turkishtea.shared.Message;
 public class MessageResource {
 
 	@Autowired
-	@Qualifier(value = "messageService")
 	private MessageService messageService;
 
 	public void setMessageService(MessageService messageService) {

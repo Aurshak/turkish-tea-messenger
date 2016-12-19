@@ -12,7 +12,5 @@
         
     <context:annotation-config />
 
-    <context:component-scan base-package="ru.klinichev.turkishtea.server"/>
-
 
 </beans>

@@ -19,6 +19,7 @@ import com.google.gwt.user.client.Timer;
 
 import ru.klinichev.turkishtea.client.UserClient;
 import ru.klinichev.turkishtea.client.place.HelloPlace;
+import ru.klinichev.turkishtea.shared.User;
 
 public class ChatViewImpl extends Composite implements ChatView {
 
@@ -78,19 +79,19 @@ public class ChatViewImpl extends Composite implements ChatView {
 	    mainPanel.add(contentPanel);
 	}
 	
-	private void buildTabs(Map<Integer, String> users) {
+	private void buildTabs(List<User> users) {
 		simpleLogger.log(Level.INFO, "Starting buildTabs()");
 		int userId = 0;
-		for (Map.Entry entry: users.entrySet()) {
-			if (entry.getValue().equals(name)) {
-				userId = (int) entry.getKey();
+		for (User u: users) {
+			if (u.getName().equals(name)) {
+				userId = u.getId();
 				break;
 			}
 		}
-		for (Map.Entry entry: users.entrySet()) {
-			if (!entry.getValue().equals(name)) {
-				final ChatPanel chatPanel = new ChatPanel(name, (String) entry.getValue(), userId, (int) entry.getKey());
-				contentPanel.add(chatPanel, (String) entry.getValue());
+		for (User u: users) {
+			if (!u.getName().equals(name)) {
+				final ChatPanel chatPanel = new ChatPanel(name, u.getName(), userId, u.getId());
+				contentPanel.add(chatPanel, u.getName());
 			}
 		}
 	}
@@ -125,7 +126,7 @@ public class ChatViewImpl extends Composite implements ChatView {
 		
 	} */
 	
-	private class GetAllUsersCallback implements MethodCallback<Map<Integer, String>> {
+	private class GetAllUsersCallback implements MethodCallback<List<User>> {
 
 		@Override
 		public void onFailure(Method method, Throwable exception) {
@@ -134,7 +135,7 @@ public class ChatViewImpl extends Composite implements ChatView {
 		}
 
 		@Override
-		public void onSuccess(Method method, Map<Integer, String> response) {
+		public void onSuccess(Method method, List<User> response) {
 			buildTabs(response);			
 		}
 		
