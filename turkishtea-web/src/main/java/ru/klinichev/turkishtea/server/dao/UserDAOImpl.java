@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.klinichev.turkishtea.shared.User;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 @Repository
 public class UserDAOImpl implements UserDAO {
@@ -32,12 +35,14 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User getUserByName(String username) {
-        simpleLogger.log(Level.INFO, "Starting getUserByName");
+        simpleLogger.log(Level.INFO, "Starting getUserByName with username " + username);
         Session session = sessionFactory.openSession();
         String hql = "FROM User WHERE name = :username";
         Query query = session.createQuery(hql);
         query.setParameter("username", username);
-        if (query.list().isEmpty()) return null;
+        if (query.list().isEmpty()) {
+            return null;
+        }
         else {
             User user = (User) query.list().get(0);
             return user;

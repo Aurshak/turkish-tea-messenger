@@ -8,16 +8,12 @@ import org.fusesource.restygwt.client.MethodCallback;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -31,6 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import ru.klinichev.turkishtea.client.UserClient;
 import ru.klinichev.turkishtea.client.place.ChatPlace;
+import ru.klinichev.turkishtea.shared.Session;
 
 public class HelloViewImpl extends Composite implements HelloView {
 
@@ -55,7 +52,7 @@ public class HelloViewImpl extends Composite implements HelloView {
 	public HelloViewImpl() {
 		simpleLogger.log(Level.INFO, "Starting HelloViewImpl()");
 		initWidget(uiBinder.createAndBindUi(this));
-		// userService.getSessionName(new GetNameCallback());
+		client.getSession(new GetSessionCallback());
 	}
 	
 	@UiHandler("signUpButton")
@@ -81,11 +78,6 @@ public class HelloViewImpl extends Composite implements HelloView {
 		logInDialog.show(); // it flashes from the right
 		loginBox.setFocus(true);
 	}
-	
-	/* @Override
-	public void setName(String name) {
-		this.name = name;
-	} */
 
 	@Override
 	public void setPresenter(Presenter listener) {
@@ -227,20 +219,22 @@ public class HelloViewImpl extends Composite implements HelloView {
 		
 	}
 	
-	/* private class GetNameCallback implements AsyncCallback<String> {
+	private class GetSessionCallback implements MethodCallback<Session> {
 
 		@Override
-		public void onFailure(Throwable caught) {
-			alert("Unable to get session name. The reason: " + caught.getMessage());
+		public void onFailure(Method method, Throwable exception) {
+			simpleLogger.log(Level.SEVERE, "Unable to get session name: ", exception);
+			alert("Unable to get session name. " + exception.toString());
 		}
 
 		@Override
-		public void onSuccess(String result) {
-			if (!result.equals("")) {
-				listener.goTo(new ChatPlace(result));
+		public void onSuccess(Method method, Session response) {
+			simpleLogger.log(Level.INFO, "Session name: " + response);
+			if (!response.getUsername().equals("DefaultSessionName")) {
+				listener.goTo(new ChatPlace(response.getUsername()));
 			}
 		}
 		
-	} */
+	}
 
 }

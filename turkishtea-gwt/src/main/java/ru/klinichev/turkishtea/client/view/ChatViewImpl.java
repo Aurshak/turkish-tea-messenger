@@ -1,7 +1,6 @@
 package ru.klinichev.turkishtea.client.view;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +53,7 @@ public class ChatViewImpl extends Composite implements ChatView {
 
 	@UiHandler("exit")
 	void onClick(ClickEvent event) {
-		// userService.setSessionName("", new SetNameCallback());
+		client.setSessionName("DefaultSessionName", new SetNameCallback());
 		contentPanel.removeFromParent();
 		listener.goTo(new HelloPlace());
 	}
@@ -63,7 +62,7 @@ public class ChatViewImpl extends Composite implements ChatView {
 	public void setName(String name) {
 		simpleLogger.log(Level.INFO, "Starting setName()");
 		this.name = name;
-		// userService.setSessionName(name, new SetNameCallback());
+		client.setSessionName(name, new SetNameCallback());
 		topLabel.setText(name);
 		contentPanel = new TabLayoutPanel(3, Unit.EM);
 		manageLayoutPanel();
@@ -112,19 +111,20 @@ public class ChatViewImpl extends Composite implements ChatView {
 		timer.schedule(2000);
 	}
 	
-	/* private class SetNameCallback implements AsyncCallback<Void> {
+	private class SetNameCallback implements MethodCallback<Void> {
 
 		@Override
-		public void onFailure(Throwable caught) {
-			alert("Unable to start the session. The reason: " + caught.getMessage());			
+		public void onFailure(Method method, Throwable exception) {
+			simpleLogger.log(Level.SEVERE, "Unable to set session name: ", exception);
+			alert("Unable to start the session. " + exception.toString());
 		}
 
 		@Override
-		public void onSuccess(Void result) {
-						
+		public void onSuccess(Method method, Void response) {
+			simpleLogger.log(Level.INFO, "Session name is set");
 		}
 		
-	} */
+	}
 	
 	private class GetAllUsersCallback implements MethodCallback<List<User>> {
 

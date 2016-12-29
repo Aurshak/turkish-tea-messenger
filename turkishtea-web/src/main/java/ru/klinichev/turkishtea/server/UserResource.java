@@ -1,17 +1,11 @@
 package ru.klinichev.turkishtea.server;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,33 +13,46 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.klinichev.turkishtea.server.service.UserService;
+import ru.klinichev.turkishtea.shared.Session;
 import ru.klinichev.turkishtea.shared.User;
 
 @RestController
 @RequestMapping("/users")
 @Path("users")
-public class UserResource {
+public class UserResource implements BeanFactoryAware {
 
 	@Autowired
 	private UserService userService;
+
+	private BeanFactory beanFactory;
+
+	/* @Autowired
+	private SessionManager sessionManager;
+
+	public void setSessionManager(SessionManager sessionManager) {
+		this.sessionManager = sessionManager;
+	} */
 
 	public void setUserService(UserService userService) {
 		this.userService = userService;
 	}
 
-	String url = "jdbc:sqlite:C:\\sqlite\\db\\hottea.db";
 	private static final Logger simpleLogger = Logger.getLogger("UserResource");
 	
 	@PostMapping
@@ -60,31 +67,7 @@ public class UserResource {
 		
 		String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
 
-		userService.addUser(new User(login, password));
-		
-		/* Connection c = null;
-		PreparedStatement pst = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection(url);
-			pst = c.prepareStatement("insert into users (name, password) values (?, ?)");
-			pst.setString(1, login);
-			pst.setString(2, hashed);
-			pst.execute();
-		}
-		catch (Exception e) {
-			simpleLogger.log(Level.SEVERE, "addUser(): Exception in try-block: ", e);
-		}
-		finally {
-			try {
-				if (c != null) {
-					c.close();
-				}
-			}
-			catch (SQLException e) {
-				simpleLogger.log(Level.SEVERE, "addUser(): Exception in finally-try-block", e);
-			}
-		} */
+		userService.addUser(new User(login, hashed));
 		
 	}
 	
@@ -95,113 +78,71 @@ public class UserResource {
 		return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 
-	@GetMapping(path="/{login}", produces="application/json")
+	@GetMapping(path="/{login}")
 	@GET
-	@Produces("application/json")
 	@Path("/{login}")
 	public boolean checkUser(@PathParam("login") @PathVariable String login, @QueryParam("password") String password) 
 			throws RuntimeException {
-		
+
+		/* try {
+			FileHandler fh = new FileHandler("C:/sqlite/hottea.log");
+			simpleLogger.addHandler(fh);
+			fh.setFormatter(new SimpleFormatter());
+			simpleLogger.log(Level.INFO, "Starting to log into file");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} */
+
 		simpleLogger.log(Level.INFO, "Starting checkUser method");
 		
 		login = escapeHtml(login);
 		password = escapeHtml(password);
-		
-		// boolean result = false;
 
-		if (userService.getUserByName(login).equals(null)) return false;
+		if (userService.getUserByName(login) == null) {
+			return false;
+		}
 		else {
 			String hashed = userService.getUserByName(login).getPassword();
 			if (BCrypt.checkpw(password, hashed)) return true;
-			else return false;
-		}
-		
-		/* Connection c = null;
-		Statement st = null;
-		ResultSet rs = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection(url);
-			st = c.createStatement();
-			st.setQueryTimeout(30);
-			rs = st.executeQuery("select password from users where name = '" + login + "'");
-		}
-		catch (Exception e) {
-			simpleLogger.log(Level.SEVERE, "checkUser(): Exception in try-block: ", e);
-		}
-		finally {
-			try {
-				if (c != null) {
-					c.close();
-				}
+			else {
+				return false;
 			}
-			catch (SQLException e) {
-				simpleLogger.log(Level.SEVERE, "checkUser(): Exception in finally-try-block", e);
-			}
-		} */
+		}
 
-		/* if (rs.isClosed()) return false;
-		String hashed = rs.getString("password");
-		if (BCrypt.checkpw(password, hashed)) {
-			result = true;
-		}
-		return result; */
 	}
 
-	/* @POST
-	public void setSessionName(@QueryParam("name") String name) {
-		HttpSession httpSession = getThreadLocalRequest().getSession(true);
-	    httpSession.setAttribute("username", name);		
+	@PostMapping(path="/session/{name}")
+	@POST
+	@Path("/session/{name}")
+	public void setSessionName(@PathParam("name") @PathVariable String name) {
+		// ApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
+		SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
+		sessionManager.getSession().setUsername(name);
 	}
 
+	@GetMapping(path="/session", produces="application/json")
 	@GET
-	public String getSessionName() {
-		HttpSession session = getThreadLocalRequest().getSession(true);
-	    if (session.getAttribute("username") != null)
-	    {
-	        return (String) session.getAttribute("username");
-	    }
-	    else 
-	    {
-	        return "";
-	    }
-	} */
+	@Produces("application/json")
+	@Path("/session")
+	public Session getSession() {
+		simpleLogger.log(Level.INFO, "Starting getSession");
+		SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
+		Session session = sessionManager.getSession();
+		simpleLogger.log(Level.INFO, session.getUsername());
+		return session;
+	}
 
 	@GetMapping(produces="application/json")
 	@GET
 	@Produces("application/json")
 	public List<User> getAllUsers() {
 		simpleLogger.log(Level.INFO, "Starting getAllUsers method");
-
 		List<User> userList = userService.getAllUsers();
-
-		/* Connection c = null;
-		Statement st = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection(url);
-			st = c.createStatement();
-			st.setQueryTimeout(30);
-			ResultSet rs = st.executeQuery("select userid, name from users");
-			while (rs.next()) {
-				users.put(rs.getInt("userid"), rs.getString("name"));
-			}
-		}
-		catch (Exception e) {
-			simpleLogger.log(Level.SEVERE, "getAllUsers(): Exception in try-block: ", e);
-		}
-		finally {
-			try {
-				if (c != null) {
-					c.close();
-				}
-			}
-			catch (SQLException e) {
-				simpleLogger.log(Level.SEVERE, "getAllUsers(): Exception in finally-try-block", e);
-			}
-		} */
-
 		return userList;
 	}
 
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
 }

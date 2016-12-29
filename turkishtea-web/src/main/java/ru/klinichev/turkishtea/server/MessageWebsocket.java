@@ -17,33 +17,33 @@ public class MessageWebsocket {
     private static Set<Session> peers = new HashSet<Session>();
 
     @OnOpen
-    public void onOpen( final Session session )
+    public void onOpen(final Session session)
     {
-        logger.info( "onOpen(" + session.getId() + ")" );
-        peers.add( session );
+        logger.info("onOpen(" + session.getId() + ")");
+        peers.add(session);
     }
 
     @OnClose
-    public void onClose( final Session session )
+    public void onClose(final Session session)
     {
-        logger.info( "onClose(" + session.getId() + ")" );
-        peers.remove( session );
+        logger.info("onClose(" + session.getId() + ")");
+        peers.remove(session);
     }
 
     @OnMessage
-    public void onMessage( final String message, final Session session )
+    public void onMessage(final String message, final Session session)
     {
-        logger.info( "onMessage(" + message + "," + session.getId() + ")" );
+        logger.info("onMessage(" + message + "," + session.getId() + ")");
         final String id = session.getId();
-        for ( final Session peer : peers )
+        for (final Session peer: peers)
         {
-            if ( peer.getId().equals( session.getId() ) )
+            if (peer.getId().equals(session.getId()))
             {
-                peer.getAsyncRemote().sendText( "You said " + message );
+                peer.getAsyncRemote().sendText("You said " + message);
             }
             else
             {
-                peer.getAsyncRemote().sendText( id + " says " + message );
+                peer.getAsyncRemote().sendText(id + " says " + message);
             }
         }
     }

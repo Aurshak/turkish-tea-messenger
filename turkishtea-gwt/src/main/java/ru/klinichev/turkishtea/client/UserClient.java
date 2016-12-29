@@ -11,6 +11,7 @@ import javax.ws.rs.QueryParam;
 
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
+import ru.klinichev.turkishtea.shared.Session;
 import ru.klinichev.turkishtea.shared.User;
 
 @Path("/api/users")
@@ -28,10 +29,12 @@ public interface UserClient extends RestService {
 	@GET
 	void getAllUsers(MethodCallback<List<User>> callback);
 	
-	/* @POST
-	void setSessionName(@QueryParam("name") String name, MethodCallback<Void> callback);
+	@POST
+	@Path("/session/{name}")
+	void setSessionName(@PathParam("name") String name, MethodCallback<Void> callback);
 	
 	@GET
-	void getSessionName(MethodCallback<String> callback); */
+	@Path("/session")
+	void getSession(MethodCallback<Session> callback);
 
 }
