@@ -1,38 +1,19 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style>
-	.html {
-		width: 100%;
-		height: 100%;
-	}
-	.image {
-		width: 180px;
-		height: 120px;
-		margin: 60px 0px 10px;
-	}
-	.button {
-		margin: 6px 6px 6px;
-	}
-	.h1 {
-		font-size: 2em;
-		font-weight: bold;
-		color: #777777;
-		margin: 40px 0px 70px;
-		text-align: center;
-	}
-	</ui:style>
-	<g:HTMLPanel styleName="{style.html}">
-		<g:Label text="Welcome to the Turkish Tea Messenger!" styleName="{style.h1}" />
-	    <div align="center">
-	        <g:VerticalPanel horizontalAlignment="align_center">
-				<g:Label text="Please sign up or log in" />
-				<g:HorizontalPanel>
-				    <g:Button ui:field="signUpButton" text="Sign up" styleName="{style.button}" />
-				    <g:Button ui:field="logInButton" text="Log in" styleName="{style.button}" />
-				</g:HorizontalPanel>
-				<g:Image url="cay-keyfi.jpg" styleName="{style.image}" />
-			</g:VerticalPanel>
-		</div>
+	<g:HTMLPanel styleName="htmlPanel">
+		<g:Label text="Welcome to the Turkish Tea Messenger!" styleName="h1" />
+	    <g:VerticalPanel styleName="vPanel">
+			<g:Label text="Please sign up or log in" styleName="center" />
+			<g:HorizontalPanel styleName="hPanel">
+				<g:cell horizontalAlignment="ALIGN_CENTER">
+					<g:Button ui:field="signUpButton" text="Sign up" styleName="button" />
+				</g:cell>
+			    <g:cell horizontalAlignment="ALIGN_CENTER">
+					<g:Button ui:field="logInButton" text="Log in" styleName="button" />
+				</g:cell>
+			</g:HorizontalPanel>
+			<g:Image url="cay-keyfi.jpg" styleName="image" />
+		</g:VerticalPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

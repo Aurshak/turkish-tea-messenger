@@ -3,6 +3,7 @@ package ru.klinichev.turkishtea.client.view;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
@@ -59,11 +60,10 @@ public class HelloViewImpl extends Composite implements HelloView {
 	void onClick1(ClickEvent e) {
 		signUpButton.setEnabled(false);
 		logInButton.setEnabled(false);
-		DialogBox signUpDialog = setDialog("signUp");
-		signUpDialog.setText("Signing up");
-		signUpDialog.setGlassEnabled(true);
-		signUpDialog.setPopupPosition(Window.getClientWidth()/2 - 100, Window.getClientHeight()/2 - 75);
-		signUpDialog.show(); // it flashes from the right
+		Dialog signUpDialog = new SignUpDialog(loginBox);
+		signUpDialog.dialogBox.setGlassEnabled(true);
+		signUpDialog.dialogBox.setPopupPosition(Window.getClientWidth()/2 - 100, Window.getClientHeight()/2 - 75);
+		signUpDialog.dialogBox.show(); // it flashes from the right
 		loginBox.setFocus(true);
 	}
 	
@@ -71,92 +71,16 @@ public class HelloViewImpl extends Composite implements HelloView {
 	void onClick(ClickEvent e) {
 		signUpButton.setEnabled(false);
 		logInButton.setEnabled(false);
-		DialogBox logInDialog = setDialog("logIn");
-		logInDialog.setText("Logging in");
-		logInDialog.setGlassEnabled(true);
-		logInDialog.setPopupPosition(Window.getClientWidth()/2 - 100, Window.getClientHeight()/2 - 75);
-		logInDialog.show(); // it flashes from the right
+		Dialog logInDialog = new LogInDialog(loginBox);
+		logInDialog.dialogBox.setGlassEnabled(true);
+		logInDialog.dialogBox.setPopupPosition(Window.getClientWidth()/2 - 100, Window.getClientHeight()/2 - 75);
+		logInDialog.dialogBox.show(); // it flashes from the right
 		loginBox.setFocus(true);
 	}
 
 	@Override
 	public void setPresenter(Presenter listener) {
 		this.listener = listener;		
-	}
-	
-	private DialogBox setDialog (String type) {
-		simpleLogger.log(Level.INFO, "Starting setDialog()");
-		final DialogBox dialogBox = new DialogBox();
-		// dialogBox.setAnimationEnabled(true);
-		Button closeButton = new Button("Close");
-		Button dialogSignUpButton = new Button("Sign up");
-		if (type == "logIn") dialogSignUpButton = new Button("Log in");
-		closeButton.getElement().setId("closeButton");
-		dialogSignUpButton.getElement().setId("closeButton");
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
-		
-		HorizontalPanel loginPanel = new HorizontalPanel();
-		loginPanel.add(loginBox);
-		loginBox.getElement().setAttribute("placeholder", "Login");
-		
-		HorizontalPanel passwordPanel = new HorizontalPanel();
-		final PasswordTextBox passwordBox = new PasswordTextBox();
-		passwordPanel.add(passwordBox);
-		passwordBox.getElement().setAttribute("placeholder", "Password");
-		
-		HorizontalPanel choicePanel = new HorizontalPanel();
-		choicePanel.add(closeButton);
-		choicePanel.add(dialogSignUpButton);
-		
-		dialogVPanel.add(loginPanel);
-		dialogVPanel.add(passwordPanel);
-		dialogVPanel.add(choicePanel);
-		dialogBox.setWidget(dialogVPanel);
-
-		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(event -> {
-            dialogBox.hide();
-            signUpButton.setEnabled(true);
-            logInButton.setEnabled(true);
-        });
-		
-		if (type == "signUp") {
-			dialogSignUpButton.addClickHandler(event -> {
-                dialogBox.hide();
-                signUpButton.setEnabled(true);
-                logInButton.setEnabled(true);
-                addToDatabase(loginBox.getValue(), passwordBox.getValue());
-            });
-			
-			passwordBox.addKeyUpHandler(event -> {
-                if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    dialogBox.hide();
-                    signUpButton.setEnabled(true);
-                    logInButton.setEnabled(true);
-                    addToDatabase(loginBox.getValue(), passwordBox.getValue());
-                }
-            });
-		}
-		else if (type == "logIn") {
-			dialogSignUpButton.addClickHandler(event -> {
-                dialogBox.hide();
-                signUpButton.setEnabled(true);
-                logInButton.setEnabled(true);
-                findInDatabase(loginBox.getValue(), passwordBox.getValue());
-            });
-			
-			passwordBox.addKeyUpHandler(event -> {
-                if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    dialogBox.hide();
-                    signUpButton.setEnabled(true);
-                    logInButton.setEnabled(true);
-                    findInDatabase(loginBox.getValue(), passwordBox.getValue());
-                }
-            });
-		}
-		
-		return dialogBox;
 	}
 	
 	private void addToDatabase(String login, String password) {
@@ -235,6 +159,76 @@ public class HelloViewImpl extends Composite implements HelloView {
 			}
 		}
 		
+	}
+
+	private class LogInDialog extends Dialog {
+
+		public LogInDialog(TextBox newLoginBox) {
+			super(newLoginBox);
+			setConfirmButtonName("Log in");
+			dialogBox.setText("Logging in");
+		}
+
+		@Override
+		public void onClickClose(ClickEvent e) {
+			super.onClickClose(e);
+			signUpButton.setEnabled(true);
+			logInButton.setEnabled(true);
+		}
+
+		@Override
+		public void onClickConfirm(ClickEvent e) {
+			super.onClickConfirm(e);
+			signUpButton.setEnabled(true);
+			logInButton.setEnabled(true);
+			findInDatabase(loginBox.getValue(), passwordBox.getValue());
+		}
+
+		@Override
+		public void onKeyDown(KeyDownEvent event) {
+			super.onKeyDown(event);
+			if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+				signUpButton.setEnabled(true);
+				logInButton.setEnabled(true);
+				findInDatabase(loginBox.getValue(), passwordBox.getValue());
+			}
+		}
+
+	}
+
+	private class SignUpDialog extends Dialog {
+
+		public SignUpDialog(TextBox newLoginBox) {
+			super(newLoginBox);
+			setConfirmButtonName("Sign up");
+			dialogBox.setText("Signing up");
+		}
+
+		@Override
+		public void onClickClose(ClickEvent e) {
+			super.onClickClose(e);
+			signUpButton.setEnabled(true);
+			logInButton.setEnabled(true);
+		}
+
+		@Override
+		public void onClickConfirm(ClickEvent e) {
+			super.onClickConfirm(e);
+			signUpButton.setEnabled(true);
+			logInButton.setEnabled(true);
+			addToDatabase(loginBox.getValue(), passwordBox.getValue());
+		}
+
+		@Override
+		public void onKeyDown(KeyDownEvent event) {
+			super.onKeyDown(event);
+			if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+				signUpButton.setEnabled(true);
+				logInButton.setEnabled(true);
+				addToDatabase(loginBox.getValue(), passwordBox.getValue());
+			}
+		}
+
 	}
 
 }

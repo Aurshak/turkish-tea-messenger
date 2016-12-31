@@ -1,0 +1,19 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    <g:HTMLPanel styleName="htmlPanel">
+        <g:DialogBox ui:field="dialogBox">
+            <g:VerticalPanel>
+                <g:TextBox ui:field="loginBox" />
+                <g:PasswordTextBox ui:field="passwordBox" />
+                <g:HorizontalPanel width="100%">
+                    <g:cell horizontalAlignment="ALIGN_CENTER">
+                        <g:Button ui:field="closeButton" styleName="dialogButton" text="Close" />
+                    </g:cell>
+                    <g:cell horizontalAlignment="ALIGN_CENTER">
+                        <g:Button ui:field="confirmButton" styleName="dialogButton" />
+                    </g:cell>
+                </g:HorizontalPanel>
+            </g:VerticalPanel>
+        </g:DialogBox>
+    </g:HTMLPanel>
+</ui:UiBinder>
