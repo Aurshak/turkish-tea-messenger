@@ -1,11 +1,8 @@
 package ru.klinichev.turkishtea.server;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,10 +16,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,13 +34,6 @@ public class UserResource implements BeanFactoryAware {
 	private UserService userService;
 
 	private BeanFactory beanFactory;
-
-	/* @Autowired
-	private SessionManager sessionManager;
-
-	public void setSessionManager(SessionManager sessionManager) {
-		this.sessionManager = sessionManager;
-	} */
 
 	public void setUserService(UserService userService) {
 		this.userService = userService;
@@ -103,10 +89,7 @@ public class UserResource implements BeanFactoryAware {
 		}
 		else {
 			String hashed = userService.getUserByName(login).getPassword();
-			if (BCrypt.checkpw(password, hashed)) return true;
-			else {
-				return false;
-			}
+			return BCrypt.checkpw(password, hashed);
 		}
 
 	}
@@ -115,7 +98,6 @@ public class UserResource implements BeanFactoryAware {
 	@POST
 	@Path("/session/{name}")
 	public void setSessionName(@PathParam("name") @PathVariable String name) {
-		// ApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
 		SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
 		sessionManager.getSession().setUsername(name);
 	}
@@ -137,8 +119,7 @@ public class UserResource implements BeanFactoryAware {
 	@Produces("application/json")
 	public List<User> getAllUsers() {
 		simpleLogger.log(Level.INFO, "Starting getAllUsers method");
-		List<User> userList = userService.getAllUsers();
-		return userList;
+		return userService.getAllUsers();
 	}
 
 	@Override

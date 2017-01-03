@@ -17,13 +17,9 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import ru.klinichev.turkishtea.client.UserClient;
@@ -163,7 +159,7 @@ public class HelloViewImpl extends Composite implements HelloView {
 
 	private class LogInDialog extends Dialog {
 
-		public LogInDialog(TextBox newLoginBox) {
+		LogInDialog(TextBox newLoginBox) {
 			super(newLoginBox);
 			setConfirmButtonName("Log in");
 			dialogBox.setText("Logging in");
@@ -198,7 +194,7 @@ public class HelloViewImpl extends Composite implements HelloView {
 
 	private class SignUpDialog extends Dialog {
 
-		public SignUpDialog(TextBox newLoginBox) {
+		SignUpDialog(TextBox newLoginBox) {
 			super(newLoginBox);
 			setConfirmButtonName("Sign up");
 			dialogBox.setText("Signing up");

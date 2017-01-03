@@ -1,37 +1,30 @@
 package ru.klinichev.turkishtea.client.view;
 
-// import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
-import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.logging.client.DevelopmentModeLogHandler;
-import com.google.gwt.logging.client.SystemLogHandler;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import org.realityforge.gwt.websockets.client.WebSocket;
 import org.realityforge.gwt.websockets.client.WebSocketListenerAdapter;
 import ru.klinichev.turkishtea.client.MessageClient;
 import ru.klinichev.turkishtea.shared.Message;
+
+import javax.annotation.Nonnull;
 
 public class ChatPanel extends Composite {
 
@@ -63,7 +56,7 @@ public class ChatPanel extends Composite {
 	
 	private static final Logger simpleLogger = Logger.getLogger("ChatPanel");
 	
-	public ChatPanel(String thisUser, String thatUser, int thisId, int thatId) {
+	ChatPanel(String thisUser, String thatUser, int thisId, int thatId) {
 		this.thisUser = thisUser;
 		this.thatUser = thatUser;
 		this.thisId = thisId;
@@ -81,7 +74,7 @@ public class ChatPanel extends Composite {
         if (webSocket != null) {
         	webSocket.setListener(new WebSocketListenerAdapter() {
 				@Override
-				public void onMessage(WebSocket webSocket, String data) {
+				public void onMessage(@Nonnull WebSocket webSocket, @Nonnull String data) {
 					simpleLogger.log(Level.INFO, "Received via websocket: " + data);
 					refreshMessages();
 				}
@@ -92,7 +85,9 @@ public class ChatPanel extends Composite {
 		}
 
 		final String moduleBaseURL = GWT.getHostPageBaseURL();
-		webSocket.connect(moduleBaseURL.replaceFirst( "http", "ws" ) + "add");
+		if (webSocket != null) {
+			webSocket.connect(moduleBaseURL.replaceFirst( "http", "ws" ) + "add");
+		}
 	}
 
 	@UiHandler("send")
@@ -120,7 +115,7 @@ public class ChatPanel extends Composite {
 		simpleLogger.log(Level.INFO, "Starting addNewMessage()");
 		FlowPanel row = new FlowPanel();
 
-		String author = null;
+		String author;
 		if (message.getSender() == thisId) author = thisUser;
 		else author = thatUser;
 		Label user = new Label(author);
@@ -153,7 +148,7 @@ public class ChatPanel extends Composite {
         }
 	}
 	
-	public void refreshMessages() {
+	private void refreshMessages() {
 		long date = (lastRefreshed == null) ? 0 : lastRefreshed.getTime();
 		client.listMessages(date, thisId, thatId, new RefreshMessagesCallback());
 	}
@@ -183,8 +178,8 @@ public class ChatPanel extends Composite {
 
 		@Override
 		public void onSuccess(Method method, List<Message> response) {
-			for (int i = 0; i < response.size(); i++) {
-				addNewMessage(response.get(i));
+			for (Message aResponse : response) {
+				addNewMessage(aResponse);
 			}
 			if (!response.isEmpty()) {
 				scrollPanel.scrollToBottom();
