@@ -1,7 +1,6 @@
 package ru.klinichev.turkishtea.client;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,7 +10,7 @@ import javax.ws.rs.QueryParam;
 
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
-import ru.klinichev.turkishtea.shared.Session;
+import org.fusesource.restygwt.client.TextCallback;
 import ru.klinichev.turkishtea.shared.User;
 
 @Path("/api/users")
@@ -35,6 +34,6 @@ public interface UserClient extends RestService {
 	
 	@GET
 	@Path("/session")
-	void getSession(MethodCallback<Session> callback);
+	void getSession(TextCallback callback);
 
 }

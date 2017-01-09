@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.BeansException;
@@ -47,12 +48,9 @@ public class UserResource implements BeanFactoryAware {
 			throws RuntimeException {
 		
 		simpleLogger.log(Level.INFO, "Starting addUser method");
-		
 		login = escapeHtml(login);
 		password = escapeHtml(password);
-		
 		String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
-
 		userService.addUser(new User(login, hashed));
 		
 	}
@@ -69,21 +67,9 @@ public class UserResource implements BeanFactoryAware {
 	@Path("/{login}")
 	public boolean checkUser(@PathParam("login") @PathVariable String login, @QueryParam("password") String password) 
 			throws RuntimeException {
-
-		/* try {
-			FileHandler fh = new FileHandler("C:/sqlite/hottea.log");
-			simpleLogger.addHandler(fh);
-			fh.setFormatter(new SimpleFormatter());
-			simpleLogger.log(Level.INFO, "Starting to log into file");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} */
-
 		simpleLogger.log(Level.INFO, "Starting checkUser method");
-		
 		login = escapeHtml(login);
 		password = escapeHtml(password);
-
 		if (userService.getUserByName(login) == null) {
 			return false;
 		}
@@ -91,27 +77,24 @@ public class UserResource implements BeanFactoryAware {
 			String hashed = userService.getUserByName(login).getPassword();
 			return BCrypt.checkpw(password, hashed);
 		}
-
 	}
 
 	@PostMapping(path="/session/{name}")
 	@POST
 	@Path("/session/{name}")
 	public void setSessionName(@PathParam("name") @PathVariable String name) {
-		SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
-		sessionManager.getSession().setUsername(name);
+		Session session = beanFactory.getBean(Session.class);
+		session.setUsername(name);
 	}
 
-	@GetMapping(path="/session", produces="application/json")
+	@GetMapping(path="/session", produces=MediaType.TEXT_PLAIN)
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.TEXT_PLAIN)
 	@Path("/session")
-	public Session getSession() {
-		simpleLogger.log(Level.INFO, "Starting getSession");
-		SessionManager sessionManager = beanFactory.getBean(SessionManager.class);
-		Session session = sessionManager.getSession();
+	public String getSession() {
+		Session session = beanFactory.getBean(Session.class);
 		simpleLogger.log(Level.INFO, session.getUsername());
-		return session;
+		return session.getUsername();
 	}
 
 	@GetMapping(produces="application/json")

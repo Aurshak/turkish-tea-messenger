@@ -22,9 +22,9 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import org.fusesource.restygwt.client.TextCallback;
 import ru.klinichev.turkishtea.client.UserClient;
 import ru.klinichev.turkishtea.client.place.ChatPlace;
-import ru.klinichev.turkishtea.shared.Session;
 
 public class HelloViewImpl extends Composite implements HelloView {
 
@@ -139,7 +139,7 @@ public class HelloViewImpl extends Composite implements HelloView {
 		
 	}
 	
-	private class GetSessionCallback implements MethodCallback<Session> {
+	private class GetSessionCallback implements TextCallback {
 
 		@Override
 		public void onFailure(Method method, Throwable exception) {
@@ -148,10 +148,10 @@ public class HelloViewImpl extends Composite implements HelloView {
 		}
 
 		@Override
-		public void onSuccess(Method method, Session response) {
+		public void onSuccess(Method method, String response) {
 			simpleLogger.log(Level.INFO, "Session name: " + response);
-			if (!response.getUsername().equals("DefaultSessionName")) {
-				listener.goTo(new ChatPlace(response.getUsername()));
+			if (!response.equals("DefaultSessionName")) {
+				listener.goTo(new ChatPlace(response));
 			}
 		}
 		
